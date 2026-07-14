@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1091858873953",
+    "project_id": "burgershop-43d6b",
+    "storage_bucket": "burgershop-43d6b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1091858873953:android:54fc90b0e44d5569eb3420",
+        "android_client_info": {
+          "package_name": "com.example.burgershop"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqgWu2-6MOggRSAbfUEO_8xIw1vGqfIi8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
