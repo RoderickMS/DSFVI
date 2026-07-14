@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:burgershop/screens/register/register_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -121,7 +122,12 @@ class LoginScreen extends StatelessWidget {
 
                 TextButton(
                   onPressed: () {
-
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const RegisterScreen(),
+                      ),
+                    );
                   },
                   child: const Text(
                     "Crear cuenta",
