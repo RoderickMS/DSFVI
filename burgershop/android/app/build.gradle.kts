@@ -30,7 +30,7 @@ android {
         applicationId = "com.example.burgershop"
 
         // Firebase Auth requiere mínimo SDK 23
-        minSdk = 23
+        minSdk = flutter.minSdkVersion
 
         targetSdk = flutter.targetSdkVersion
 
