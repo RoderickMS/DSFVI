@@ -62,6 +62,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1091858873953',
     projectId: 'burgershop-43d6b',
     storageBucket: 'burgershop-43d6b.firebasestorage.app',
+    iosClientId: '1091858873953-i40a1hhsmu1iokg4pa1h4foclkj9i32u.apps.googleusercontent.com',
     iosBundleId: 'com.example.burgershop',
   );
   static const FirebaseOptions macos = FirebaseOptions(
@@ -70,6 +71,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1091858873953',
     projectId: 'burgershop-43d6b',
     storageBucket: 'burgershop-43d6b.firebasestorage.app',
+    iosClientId: '1091858873953-i40a1hhsmu1iokg4pa1h4foclkj9i32u.apps.googleusercontent.com',
     iosBundleId: 'com.example.burgershop',
   );
 
