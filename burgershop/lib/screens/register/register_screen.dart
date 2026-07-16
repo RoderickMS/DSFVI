@@ -40,6 +40,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             "nombre": nombreController.text.trim(),
             "correo": correoController.text.trim(),
             "telefono": telefonoController.text.trim(),
+            "rol": "cliente",
             "fechaRegistro": Timestamp.now(),
 
           });
