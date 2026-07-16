@@ -1,12 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-// Versión sin datos de ejemplo — así se ve el Menú cuando todavía
-// no hay productos cargados por el admin (o antes de conectar Firestore).
-//
-// TODO: cuando conectes Firestore, reemplaza _categorias (lista fija)
-// y _productos (lista vacía) por streams reales de las colecciones
-// /categorias y /productos. Cuando el admin agregue productos, esta
-// misma pantalla los mostrará automáticamente sin más cambios de UI.
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
 
@@ -16,23 +10,6 @@ class MenuScreen extends StatefulWidget {
 
 class _MenuScreenState extends State<MenuScreen> {
   String _categoriaSeleccionada = "Todas";
-
-  final List<String> _categorias = [
-    "Todas",
-    "Hamburguesas",
-    "Bebidas",
-    "Postres",
-  ];
-
-  // Sin productos todavía — el admin aún no ha agregado ninguno.
-  final List<Map<String, dynamic>> _productos = [];
-
-  List<Map<String, dynamic>> get _productosFiltrados {
-    if (_categoriaSeleccionada == "Todas") return _productos;
-    return _productos
-        .where((p) => p["categoria"] == _categoriaSeleccionada)
-        .toList();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,14 +40,9 @@ class _MenuScreenState extends State<MenuScreen> {
             icon: const Icon(Icons.arrow_back),
             color: Colors.black87,
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: const [
-              Text(
-                "Nuestro Menú",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              ),
-            ],
+          const Text(
+            "Nuestro Menú",
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
           IconButton(
             onPressed: () {
@@ -84,16 +56,20 @@ class _MenuScreenState extends State<MenuScreen> {
     );
   }
 
+  // Las categorías también pueden salir de Firestore (colección /categorias).
+  // Por ahora dejamos una lista fija + "Todas".
   Widget _buildCategorias() {
+    final categorias = ["Todas", "Hamburguesas", "Bebidas", "Postres"];
+
     return SizedBox(
       height: 45,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 20),
-        itemCount: _categorias.length,
+        itemCount: categorias.length,
         separatorBuilder: (_, __) => const SizedBox(width: 10),
         itemBuilder: (context, index) {
-          final categoria = _categorias[index];
+          final categoria = categorias[index];
           final seleccionada = categoria == _categoriaSeleccionada;
 
           return ChoiceChip(
@@ -118,58 +94,81 @@ class _MenuScreenState extends State<MenuScreen> {
     );
   }
 
-  // Estado vacío: se muestra mientras el admin no ha agregado productos.
   Widget _buildContenido() {
-    final productos = _productosFiltrados;
+    // Solo trae productos disponibles - el switch que maneja el admin
+    Query query = FirebaseFirestore.instance
+        .collection('productos')
+        .where('disponible', isEqualTo: true);
 
-    if (productos.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(30),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text("🍔", style: TextStyle(fontSize: 60)),
-              const SizedBox(height: 15),
-              const Text(
-                "Aún no hay productos",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                "El menú estará disponible muy pronto.\nVuelve más tarde para ver nuestras hamburguesas.",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
-              ),
-            ],
-          ),
-        ),
-      );
+    // Si hay categoría seleccionada distinta de "Todas", filtramos también
+    if (_categoriaSeleccionada != "Todas") {
+      query = query.where('categoria', isEqualTo: _categoriaSeleccionada);
     }
 
-    // Cuando ya existan productos (agregados por el admin), se mostrarán
-    // aquí en un grid, igual que en la versión anterior con datos de ejemplo.
-    return GridView.builder(
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-      itemCount: productos.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 15,
-        crossAxisSpacing: 15,
-        childAspectRatio: 0.75,
-      ),
-      itemBuilder: (context, index) {
-        final producto = productos[index];
-        return _buildProductoCard(producto);
+    return StreamBuilder<QuerySnapshot>(
+      stream: query.snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(child: Text("Error: ${snapshot.error}"));
+        }
+        if (!snapshot.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final docs = snapshot.data!.docs;
+
+        if (docs.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(30),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text("🍔", style: TextStyle(fontSize: 60)),
+                  const SizedBox(height: 15),
+                  const Text(
+                    "Aún no hay productos",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "El menú estará disponible muy pronto.\nVuelve más tarde para ver nuestras hamburguesas.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        return GridView.builder(
+          padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+          itemCount: docs.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 15,
+            crossAxisSpacing: 15,
+            childAspectRatio: 0.75,
+          ),
+          itemBuilder: (context, index) {
+            final data = docs[index].data() as Map<String, dynamic>;
+            return _buildProductoCard(data);
+          },
+        );
       },
     );
   }
 
   Widget _buildProductoCard(Map<String, dynamic> producto) {
+    final nombre = producto['nombre'] ?? '';
+    final precio = (producto['precio'] ?? 0).toDouble();
+    final imagenUrl = producto['imagenUrl'] ?? '';
+
     return GestureDetector(
       onTap: () {
         // TODO: navegar al detalle del producto
@@ -197,10 +196,18 @@ class _MenuScreenState extends State<MenuScreen> {
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(15),
                   ),
+                  image: imagenUrl.isNotEmpty
+                      ? DecorationImage(
+                          image: NetworkImage(imagenUrl),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
                 ),
-                child: const Center(
-                  child: Text("🍔", style: TextStyle(fontSize: 40)),
-                ),
+                child: imagenUrl.isEmpty
+                    ? const Center(
+                        child: Text("🍔", style: TextStyle(fontSize: 40)),
+                      )
+                    : null,
               ),
             ),
             Padding(
@@ -209,7 +216,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    producto["nombre"],
+                    nombre,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -222,7 +229,7 @@ class _MenuScreenState extends State<MenuScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "\$${producto["precio"].toStringAsFixed(2)}",
+                        "\$${precio.toStringAsFixed(2)}",
                         style: const TextStyle(
                           color: Colors.orange,
                           fontWeight: FontWeight.bold,
