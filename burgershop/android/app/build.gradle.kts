@@ -1,12 +1,7 @@
 plugins {
     id("com.android.application")
-
-    // Firebase
     id("com.google.gms.google-services")
-
     id("kotlin-android")
-
-    // Flutter
     id("dev.flutter.flutter-gradle-plugin")
 }
 
@@ -14,7 +9,7 @@ android {
     namespace = "com.example.burgershop"
     compileSdk = flutter.compileSdkVersion
 
-    // Requerido por Firebase
+    // Requerido por algunas librerías de Firebase
     ndkVersion = "27.0.12077973"
 
     compileOptions {
@@ -29,8 +24,8 @@ android {
     defaultConfig {
         applicationId = "com.example.burgershop"
 
-        // Firebase Auth requiere mínimo SDK 23
-        minSdk = flutter.minSdkVersion
+        // Firebase Auth 6.x requiere Android SDK 23 o superior
+        minSdk = 23
 
         targetSdk = flutter.targetSdkVersion
 
@@ -40,7 +35,7 @@ android {
 
     buildTypes {
         release {
-            // Firma temporal para pruebas
+            // Cambia esto por tu configuración de firma cuando generes un APK de producción
             signingConfig = signingConfigs.getByName("debug")
         }
     }
