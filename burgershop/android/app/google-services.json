@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1091858873953-ulr3tilqj17cpgaq59kaidcp1rhcts81.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.burgershop",
+            "certificate_hash": "2822c53288b777be0b41472cd9c3c2bacee0b917"
+          }
+        },
+        {
           "client_id": "1091858873953-eftgqtmdra4or1ta7gsuhocpnj3q17i0.apps.googleusercontent.com",
           "client_type": 3
         }

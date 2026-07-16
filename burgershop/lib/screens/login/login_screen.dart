@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:burgershop/services/auth_service.dart';
+import 'package:burgershop/screens/admin/admin_screen.dart';
 import 'package:burgershop/screens/home/home_screen.dart';
 import 'package:burgershop/screens/register/register_screen.dart';
 import 'package:burgershop/screens/admin/admin_screen.dart';
-
 
 
 class LoginScreen extends StatefulWidget {
@@ -27,6 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final emailController = TextEditingController();
 
   final passwordController = TextEditingController();
+  final AuthService authService = AuthService();
 
 
 
@@ -365,7 +367,51 @@ class _LoginScreenState extends State<LoginScreen> {
 
 
 
+  Future<void> iniciarGoogle() async {
 
+    try {
+
+      String rol = await authService.loginGoogle();
+
+
+      if (!mounted) return;
+
+
+      if (rol == "administrador") {
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const AdminScreen(),
+          ),
+        );
+
+
+      } else {
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const HomeScreen(),
+          ),
+        );
+
+      }
+
+
+    } catch (e) {
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+        ),
+      );
+
+    }
+
+  }
 
 
 
@@ -800,6 +846,49 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height:20),
 
 
+
+                    const SizedBox(height:20),
+
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+
+                      child: OutlinedButton.icon(
+
+                        onPressed: iniciarGoogle,
+
+                        icon: const Icon(
+                          Icons.login,
+                        ),
+
+                        label: const Text(
+                          "Continuar con Google",
+                          style: TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+
+                        style: OutlinedButton.styleFrom(
+
+                          foregroundColor: Colors.black87,
+
+                          side: const BorderSide(
+                            color: Colors.orange,
+                          ),
+
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+
+                        ),
+
+                      ),
+
+                    ),
+
+
+                    const SizedBox(height:20),
 
 
 
