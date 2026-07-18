@@ -2,7 +2,7 @@ import 'package:burgershop/screens/login/login_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
+import 'package:google_sign_in/google_sign_in.dart';
 // Pantalla de Perfil. Se llega aquí desde Home (ícono de perfil o tarjeta).
 // Carga los datos reales del usuario autenticado: primero desde
 // FirebaseAuth (correo, nombre si lo tiene) y luego completa/actualiza con
@@ -322,17 +322,20 @@ class _PerfilScreenState extends State<PerfilScreen> {
     if (confirmar != true) return;
 
     try {
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+      await googleSignIn.signOut();
       await FirebaseAuth.instance.signOut();
+
       if (!context.mounted) return;
-      // Limpia todo el historial de navegación para que el usuario no
-      // pueda "regresar" a pantallas protegidas con el botón atrás.
+
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
         (route) => false,
       );
     } catch (e) {
       if (!context.mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("No se pudo cerrar sesión: $e")),
       );
