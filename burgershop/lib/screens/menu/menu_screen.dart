@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:burgershop/screens/carrito/carrito_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:burgershop/models/cart_item.dart';
+import 'package:burgershop/providers/cart_provider.dart';
+
+
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -10,6 +17,9 @@ class MenuScreen extends StatefulWidget {
 
 class _MenuScreenState extends State<MenuScreen> {
   String _categoriaSeleccionada = "Todas";
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +56,12 @@ class _MenuScreenState extends State<MenuScreen> {
           ),
           IconButton(
             onPressed: () {
-              // TODO: navegar al carrito
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const CartScreen(),
+                ),
+              );
             },
             icon: const Icon(Icons.shopping_cart_outlined),
             color: Colors.orange,
@@ -156,15 +171,21 @@ class _MenuScreenState extends State<MenuScreen> {
             childAspectRatio: 0.75,
           ),
           itemBuilder: (context, index) {
-            final data = docs[index].data() as Map<String, dynamic>;
-            return _buildProductoCard(data);
+            final doc = docs[index];
+
+            final data = doc.data() as Map<String, dynamic>;
+
+            return _buildProductoCard(data, doc.id);
           },
         );
       },
     );
   }
 
-  Widget _buildProductoCard(Map<String, dynamic> producto) {
+  Widget _buildProductoCard(
+  Map<String, dynamic> producto,
+  String productoId,
+) {
     final nombre = producto['nombre'] ?? '';
     final precio = (producto['precio'] ?? 0).toDouble();
     final imagenUrl = producto['imagenUrl'] ?? '';
@@ -243,7 +264,26 @@ class _MenuScreenState extends State<MenuScreen> {
                         ),
                         child: IconButton(
                           onPressed: () {
-                            // TODO: agregar producto al carrito
+                            Provider.of<CartProvider>(
+                              context,
+                              listen: false,
+                            ).addProduct(
+                              CartItem(
+                                id: productoId,
+                                nombre: producto['nombre'] ?? '',
+                                descripcion: producto['descripcion'] ?? '',
+                                categoria: producto['categoria'] ?? '',
+                                imagenUrl: producto['imagenUrl'] ?? '',
+                                precio: (producto['precio'] ?? 0).toDouble(),
+                              ),
+                            );
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("${producto['nombre']} agregado al carrito"),
+                                duration: const Duration(seconds: 1),
+                              ),
+                            );
                           },
                           icon: const Icon(Icons.add, size: 18),
                           color: Colors.white,
