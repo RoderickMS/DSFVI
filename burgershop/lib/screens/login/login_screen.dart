@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -430,10 +431,19 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SafeArea(
 
 
-        child: SingleChildScrollView(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            // En pantallas anchas (tablet/computadora) limitamos el ancho
+            // del formulario completo, para que el logo no se estire de
+            // borde a borde y se vea pequeño con mucho espacio vacío.
+            final anchoPantalla = constraints.maxWidth;
+            final anchoMaximo = anchoPantalla > 600 ? 480.0 : anchoPantalla;
 
-
-          child: Column(
+            return SingleChildScrollView(
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: anchoMaximo),
+                  child: Column(
 
 
             children: [
@@ -463,75 +473,34 @@ class _LoginScreenState extends State<LoginScreen> {
 
 
 
-                    Image.asset(
-
-                      "assets/imagenes/logo.png",
-
-                      fit: BoxFit.cover,
-
+                    // Capa 1: la misma imagen de fondo, recortada (cover) y
+                    // desenfocada. El recorte no se nota porque el blur
+                    // difumina los bordes — funciona en cualquier proporción
+                    // de pantalla sin dejar espacios vacíos.
+                    ImageFiltered(
+                      imageFilter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                      child: Image.asset(
+                        "assets/imagenes/logo.png",
+                        fit: BoxFit.cover,
+                      ),
                     ),
 
+                    // Oscurece un poco el fondo desenfocado para que el
+                    // logo nítido de encima resalte con más contraste.
+                    Container(color: Colors.black.withOpacity(0.35)),
 
-
-
-                    Container(
-
-                      decoration: const BoxDecoration(
-
-                        gradient: LinearGradient(
-
-                          begin: Alignment.topCenter,
-
-                          end: Alignment.bottomCenter,
-
-                          colors: [
-
-                            Colors.transparent,
-
-                            Colors.black45,
-
-                          ],
-
+                    // Capa 2: el logo real, completo y nítido, sin recortar
+                    // ningún texto — se ve igual de bien sin importar el
+                    // ancho de la pantalla.
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 24),
+                        child: Image.asset(
+                          "assets/imagenes/logo.png",
+                          fit: BoxFit.contain,
                         ),
-
                       ),
-
                     ),
-
-
-
-
-
-                    const Positioned(
-
-                      bottom:25,
-
-                      left:0,
-
-                      right:0,
-
-
-                      child:Text(
-
-                        "BurgerRush",
-
-                        textAlign:TextAlign.center,
-
-                        style:TextStyle(
-
-                          color:Colors.white,
-
-                          fontSize:30,
-
-                          fontWeight:FontWeight.bold,
-
-                        ),
-
-                      ),
-
-                    )
-
-
 
                   ],
 
@@ -992,7 +961,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
 
           ),
-
+                ),
+              ),
+            );
+          },
         ),
 
       ),
