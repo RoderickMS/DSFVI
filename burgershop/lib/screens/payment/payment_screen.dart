@@ -136,41 +136,67 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   // ---------- Resumen del total (misma info, tarjeta con sombra) ----------
 
-  Widget _buildResumenTotal(CartProvider cart) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text(
-            "Total",
-            style: TextStyle(fontSize: 16, color: Colors.grey),
-          ),
-          Text(
-            "B/. ${cart.total.toStringAsFixed(2)}",
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.deepOrange,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+Widget _buildResumenTotal(CartProvider cart) {
+  return Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(18),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.05),
+          blurRadius: 8,
+          offset: const Offset(0, 3),
+        ),
+      ],
+    ),
+    child: Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text("Subtotal"),
+            Text("B/. ${cart.subtotal.toStringAsFixed(2)}"),
+          ],
+        ),
 
+        const SizedBox(height: 8),
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text("ITBMS (7%)"),
+            Text("B/. ${cart.itbms.toStringAsFixed(2)}"),
+          ],
+        ),
+
+        const Divider(height: 24),
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              "Total a pagar",
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              "B/. ${cart.totalConItbms.toStringAsFixed(2)}",
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.deepOrange,
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
+}
   // ---------- Botón continuar (misma lógica exacta que ya tenías) ----------
 
   Widget _buildBotonContinuar(BuildContext context) {
