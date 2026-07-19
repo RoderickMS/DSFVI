@@ -40,35 +40,100 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFFF8F2),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildBanner(context),
-            Transform.translate(
-              offset: const Offset(0, -28),
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFFF8F2),
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final anchoPantalla = constraints.maxWidth;
+          final esTablet = anchoPantalla > 700;
+          final esEscritorio = anchoPantalla > 1100;
+
+          // El banner ahora siempre ocupa el ancho completo de la pantalla,
+          // no solo el de una columna angosta centrada. Solo el contenido
+          // de abajo se limita a un ancho máximo legible.
+          final anchoContenido = esEscritorio
+              ? 1000.0
+              : esTablet
+                  ? 780.0
+                  : anchoPantalla;
+
+          final columnasCategorias = esEscritorio
+              ? 5
+              : esTablet
+                  ? 5
+                  : 3;
+
+          return SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildBanner(context),
+                Transform.translate(
+                  offset: const Offset(0, -28),
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFFFF8F2),
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+                    ),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: esTablet ? 32 : 20,
+                      vertical: 24,
+                    ),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: anchoContenido),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // En pantallas de tablet/laptop la tarjeta de menú
+                            // y el historial se ven lado a lado para
+                            // aprovechar el ancho en vez de dejar espacio
+                            // vacío a los costados.
+                            esTablet
+                                // IntrinsicHeight es necesario aquí: un Row con
+                                // CrossAxisAlignment.stretch donde TODOS los
+                                // hijos son Expanded, dentro de un
+                                // SingleChildScrollView (altura no acotada),
+                                // no tiene forma de saber qué altura usar y
+                                // colapsa a 0 (las tarjetas "desaparecen").
+                                // IntrinsicHeight calcula la altura real según
+                                // el contenido antes de estirar los hijos.
+                                ? IntrinsicHeight(
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                      children: [
+                                        Expanded(
+                                          flex: 3,
+                                          child: _buildTarjetaMenuDestacada(context),
+                                        ),
+                                        const SizedBox(width: 16),
+                                        Expanded(
+                                          flex: 2,
+                                          child: _buildBarraHistorial(context, vertical: true),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : Column(
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    children: [
+                                      _buildTarjetaMenuDestacada(context),
+                                      const SizedBox(height: 14),
+                                      _buildBarraHistorial(context),
+                                    ],
+                                  ),
+                            const SizedBox(height: 28),
+                            _buildTituloSeccion("Categorías populares"),
+                            const SizedBox(height: 14),
+                            _buildCategorias(columnasCategorias),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildTarjetaMenuDestacada(context),
-                    const SizedBox(height: 16),
-                    _buildAccesosSecundarios(context),
-                    const SizedBox(height: 28),
-                    _buildTituloSeccion("Categorías populares"),
-                    const SizedBox(height: 14),
-                    _buildCategorias(),
-                  ],
-                ),
-              ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -99,16 +164,15 @@ class _HomeScreenState extends State<HomeScreen> {
       MaterialPageRoute(builder: (context) => const PerfilScreen()),
     );
   }
-  void _irAHistorial(BuildContext context) {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => const HistorialScreen(),
-    ),
-  );
-}
 
-  // ---------- Banner con imágenes rotando ----------
+  void _irAHistorial(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const HistorialScreen()),
+    );
+  }
+
+  // ---------- Banner con imágenes rotando (ahora a todo lo ancho) ----------
 
   Widget _buildBanner(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -116,6 +180,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return SizedBox(
       height: altura,
+      width: double.infinity,
       child: Stack(
         fit: StackFit.expand,
         children: [
@@ -192,6 +257,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // Header del banner: solo queda el acceso a Perfil a la izquierda.
+  // Se quitó el ícono del carrito; se deja un espacio invisible del mismo
+  // tamaño a la derecha para que "BurgerShop" siga centrado.
   Widget _buildHeader(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -208,42 +276,18 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         const Text(
-          "BurgerRush",
+          "BurgerShop",
           style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
         ),
-        Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(Icons.shopping_cart_outlined, color: Colors.white, size: 22),
-            ),
-            Positioned(
-              right: -4,
-              top: -4,
-              child: Container(
-                width: 16,
-                height: 16,
-                decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-                child: const Center(
-                  child: Text("2", style: TextStyle(color: Colors.white, fontSize: 9)),
-                ),
-              ),
-            ),
-          ],
-        ),
+        // Espaciador invisible: mismo tamaño aprox. que el botón de perfil
+        // (10 padding + 22 icono + 10 padding = 42) para mantener el
+        // título centrado sin el ícono del carrito.
+        const SizedBox(width: 42),
       ],
     );
   }
 
   // ---------- Tarjeta grande destacada: "Ver menú" ----------
-  // En vez de un ícono más del montón, la acción principal (ver el menú)
-  // tiene su propia tarjeta ancha con gradiente, para que destaque sobre
-  // las demás opciones secundarias.
 
   Widget _buildTarjetaMenuDestacada(BuildContext context) {
     return GestureDetector(
@@ -272,6 +316,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: const [
                   Text(
                     "Explora el menú",
@@ -304,73 +349,96 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ---------- Accesos secundarios, más pequeños, debajo de la tarjeta principal ----------
+  // ---------- Historial ----------
+  // `vertical: true` se usa en tablet/laptop, donde va al lado de la
+  // tarjeta de menú y se ve mejor como un bloque más alto en vez de una
+  // barra horizontal delgada.
 
-  Widget _buildAccesosSecundarios(BuildContext context) {
-    final accesos = [
-      _Acceso(
-        icono: Icons.shopping_cart_outlined,
-        titulo: "Carrito",
-        color: Colors.pinkAccent.shade200,
-        onTap: () {
-          // TODO: navegar a CarritoScreen
-        },
-      ),
-      _Acceso(
-        icono: Icons.receipt_long_outlined,
-        titulo: "Historial",
-        color: Colors.teal,
+  Widget _buildBarraHistorial(BuildContext context, {bool vertical = false}) {
+    if (vertical) {
+      return GestureDetector(
         onTap: () => _irAHistorial(context),
-      ),
-      _Acceso(
-        icono: Icons.person_outline,
-        titulo: "Perfil",
-        color: Colors.indigo,
-        onTap: () => _irAPerfil(context),
-      ),
-    ];
-
-    return Row(
-      children: accesos
-          .map(
-            (item) => Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(right: 10),
-                child: _buildAccesoSecundarioItem(item),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.black12),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.teal.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.receipt_long_outlined, color: Colors.teal, size: 20),
               ),
-            ),
-          )
-          .toList(),
-    );
-  }
+              const SizedBox(height: 14),
+              const Text(
+                "Historial de pedidos",
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+              ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Text(
+                    "Ver pedidos",
+                    style: TextStyle(color: Colors.grey.shade500, fontSize: 12.5),
+                  ),
+                  const SizedBox(width: 2),
+                  Icon(Icons.chevron_right, color: Colors.grey.shade400, size: 18),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
-  Widget _buildAccesoSecundarioItem(_Acceso item) {
     return GestureDetector(
-      onTap: item.onTap,
+      onTap: () => _irAHistorial(context),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14),
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: Colors.black12),
         ),
-        child: Column(
+        child: Row(
           children: [
-            Icon(item.icono, color: item.color, size: 22),
-            const SizedBox(height: 6),
-            Text(
-              item.titulo,
-              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.teal.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(Icons.receipt_long_outlined, color: Colors.teal, size: 20),
             ),
+            const SizedBox(width: 14),
+            const Expanded(
+              child: Text(
+                "Historial de pedidos",
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+              ),
+            ),
+            Icon(Icons.chevron_right, color: Colors.grey.shade400),
           ],
         ),
       ),
     );
   }
 
-  // ---------- Categorías como tarjetas grandes con color completo ----------
+  // ---------- Categorías, columnas según ancho de pantalla ----------
 
-  Widget _buildCategorias() {
+  Widget _buildCategorias(int columnas) {
     final categorias = [
       _Categoria(emoji: "🍔", nombre: "Burgers", color: const Color(0xFFFF8A3D)),
       _Categoria(emoji: "🍟", nombre: "Papas", color: const Color(0xFFFFC542)),
@@ -379,62 +447,50 @@ class _HomeScreenState extends State<HomeScreen> {
       _Categoria(emoji: "🍗", nombre: "Pollo", color: const Color(0xFF8D6E63)),
     ];
 
-    return SizedBox(
-      height: 130,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: categorias.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 14),
-        itemBuilder: (context, index) {
-          final cat = categorias[index];
-          return Container(
-            width: 105,
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: cat.color,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: cat.color.withOpacity(0.35),
-                  blurRadius: 10,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(cat.emoji, style: const TextStyle(fontSize: 30)),
-                Text(
-                  cat.nombre,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: categorias.length,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: columnas,
+        mainAxisSpacing: 14,
+        crossAxisSpacing: 14,
+        childAspectRatio: 0.85,
       ),
+      itemBuilder: (context, index) {
+        final cat = categorias[index];
+        return Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: cat.color,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: cat.color.withOpacity(0.35),
+                blurRadius: 10,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(cat.emoji, style: const TextStyle(fontSize: 28)),
+              Text(
+                cat.nombre,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
-}
-
-class _Acceso {
-  final IconData icono;
-  final String titulo;
-  final Color color;
-  final VoidCallback onTap;
-
-  _Acceso({
-    required this.icono,
-    required this.titulo,
-    required this.color,
-    required this.onTap,
-  });
 }
 
 class _Categoria {

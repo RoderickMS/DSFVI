@@ -18,131 +18,201 @@ class _PaymentScreenState extends State<PaymentScreen> {
     final cart = Provider.of<CartProvider>(context);
 
     return Scaffold(
+      backgroundColor: const Color(0xFFFFF8F2),
       appBar: AppBar(
-        title: const Text("Método de pago"),
-        backgroundColor: Colors.orange,
+        backgroundColor: const Color(0xFFFFF8F2),
+        elevation: 0,
+        foregroundColor: Colors.black87,
+        title: const Text(
+          "Método de pago",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-
-            const Text(
-              "Seleccione un método de pago",
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Seleccione un método de pago",
+                style: TextStyle(
+                  fontSize: 19,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
               ),
-            ),
-
-            const SizedBox(height: 30),
-
-            RadioListTile(
-              value: "Efectivo",
-              groupValue: metodo,
-              title: const Text("Efectivo"),
-              onChanged: (value) {
-                setState(() {
-                  metodo = value.toString();
-                });
-              },
-            ),
-
-            RadioListTile(
-              value: "Tarjeta",
-              groupValue: metodo,
-              title: const Text("Tarjeta"),
-              onChanged: (value) {
-                setState(() {
-                  metodo = value.toString();
-                });
-              },
-            ),
-
-            RadioListTile(
-              value: "Yappy",
-              groupValue: metodo,
-              title: const Text("Yappy"),
-              onChanged: (value) {
-                setState(() {
-                  metodo = value.toString();
-                });
-              },
-            ),
-
-            const Spacer(),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-
-                const Text(
-                  "Total",
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-                Text(
-                  "B/. ${cart.total.toStringAsFixed(2)}",
-                  style: const TextStyle(
-                    fontSize: 22,
-                    color: Colors.orange,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-              ],
             ),
 
             const SizedBox(height: 20),
 
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                ),
-                onPressed: () {
+            _buildOpcionMetodo(
+              value: "Efectivo",
+              titulo: "Efectivo",
+              emoji: "💵",
+              colorAcento: Colors.green.shade600,
+            ),
 
-                  if (metodo == "Yappy") {
+            const SizedBox(height: 12),
 
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const YappyScreen(),
-                      ),
-                    );
+            _buildOpcionMetodo(
+              value: "Tarjeta",
+              titulo: "Tarjeta",
+              emoji: "💳",
+              colorAcento: Colors.blue.shade600,
+            ),
 
-                  }
+            const SizedBox(height: 12),
 
-                  if (metodo == "Efectivo") {
+            _buildOpcionMetodo(
+              value: "Yappy",
+              titulo: "Yappy",
+              emoji: "💜",
+              colorAcento: const Color(0xFF6F2DBD),
+            ),
 
-                    // Después guardaremos el pedido aquí
+            const Spacer(),
 
-                  }
+            _buildResumenTotal(cart),
 
-                  if (metodo == "Tarjeta") {
+            const SizedBox(height: 20),
 
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Próximamente"),
-                      ),
-                    );
-
-                  }
-
-                },
-                child: const Text(
-                  "Continuar",
-                  style: TextStyle(fontSize: 18),
-                ),
-              ),
-            )
-
+            _buildBotonContinuar(context),
           ],
+        ),
+      ),
+    );
+  }
+
+  // ---------- Tarjeta seleccionable de cada método (mismo RadioListTile,
+  // solo con apariencia de tarjeta en vez del estilo por defecto) ----------
+
+  Widget _buildOpcionMetodo({
+    required String value,
+    required String titulo,
+    required String emoji,
+    required Color colorAcento,
+  }) {
+    final seleccionado = metodo == value;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: seleccionado ? colorAcento : Colors.black12,
+          width: seleccionado ? 2 : 1,
+        ),
+      ),
+      child: RadioListTile<String>(
+        value: value,
+        groupValue: metodo,
+        onChanged: (nuevoValor) {
+          setState(() {
+            metodo = nuevoValor.toString();
+          });
+        },
+        activeColor: colorAcento,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        secondary: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: colorAcento.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Center(child: Text(emoji, style: const TextStyle(fontSize: 20))),
+        ),
+        title: Text(
+          titulo,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+        ),
+      ),
+    );
+  }
+
+  // ---------- Resumen del total (misma info, tarjeta con sombra) ----------
+
+  Widget _buildResumenTotal(CartProvider cart) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            "Total",
+            style: TextStyle(fontSize: 16, color: Colors.grey),
+          ),
+          Text(
+            "B/. ${cart.total.toStringAsFixed(2)}",
+            style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Colors.deepOrange,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ---------- Botón continuar (misma lógica exacta que ya tenías) ----------
+
+  Widget _buildBotonContinuar(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 52,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.deepOrange,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
+        onPressed: () {
+          if (metodo == "Yappy") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const YappyScreen(),
+              ),
+            );
+          }
+
+          if (metodo == "Efectivo") {
+            // Después guardaremos el pedido aquí
+          }
+
+          if (metodo == "Tarjeta") {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Próximamente"),
+              ),
+            );
+          }
+        },
+        child: const Text(
+          "Continuar",
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
