@@ -711,7 +711,7 @@ class _PedidosTab extends StatelessWidget {
 
   Widget _buildPedidoTile(QueryDocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
-    final cliente = data['clienteNombre'] ?? 'Cliente';
+    final cliente = data['correoCliente'] ?? 'Cliente';
     final total = (data['total'] ?? 0).toDouble();
     final estado = data['estado'] ?? 'pendiente';
     final List productos = data['productos'] ?? [];

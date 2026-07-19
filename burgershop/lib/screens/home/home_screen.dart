@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-
+import '../historial/historial_screen.dart';
 import '../menu/menu_screen.dart';
 import '../perfil/perfil_screen.dart';
 
@@ -99,6 +99,14 @@ class _HomeScreenState extends State<HomeScreen> {
       MaterialPageRoute(builder: (context) => const PerfilScreen()),
     );
   }
+  void _irAHistorial(BuildContext context) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => const HistorialScreen(),
+    ),
+  );
+}
 
   // ---------- Banner con imágenes rotando ----------
 
@@ -312,9 +320,7 @@ class _HomeScreenState extends State<HomeScreen> {
         icono: Icons.receipt_long_outlined,
         titulo: "Historial",
         color: Colors.teal,
-        onTap: () {
-          // TODO: navegar a HistorialScreen
-        },
+        onTap: () => _irAHistorial(context),
       ),
       _Acceso(
         icono: Icons.person_outline,
