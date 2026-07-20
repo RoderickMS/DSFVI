@@ -281,12 +281,6 @@ class _ProductosTabState extends State<_ProductosTab> {
     );
   }
 
-  // -----------------------------------------------------------------
-  // Tarjeta de producto rediseñada: imagen más grande, badge de
-  // categoría, y edición/eliminación agrupadas en un menú (⋮) para que
-  // la fila se vea menos cargada. El switch de disponibilidad se deja
-  // visible porque es la acción más frecuente.
-  // -----------------------------------------------------------------
   Widget _buildProductoCard(QueryDocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     final id = doc.id;
@@ -867,7 +861,8 @@ class _PedidosTab extends StatelessWidget {
                     FirebaseFirestore.instance
                         .collection('pedidos')
                         .doc(doc.id)
-                        .update({'estado': nuevoEstado});
+                        .update({'estado': nuevoEstado,
+                        'estadoPago': 'pagado'});
                   },
                 ),
               ),
