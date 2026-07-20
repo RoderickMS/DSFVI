@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:burgershop/providers/cart_provider.dart';
 import 'package:burgershop/screens/payment/yappy_screen.dart';
+import 'package:burgershop/services/order_service.dart';
+
 
 class PaymentScreen extends StatefulWidget {
   const PaymentScreen({super.key});
@@ -12,6 +14,8 @@ class PaymentScreen extends StatefulWidget {
 
 class _PaymentScreenState extends State<PaymentScreen> {
   String metodo = "Yappy";
+  final OrderService orderService = OrderService();
+
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +81,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
             const SizedBox(height: 20),
 
-            _buildBotonContinuar(context),
+            _buildBotonContinuar(context, cart),
           ],
         ),
       ),
@@ -197,7 +201,7 @@ Widget _buildResumenTotal(CartProvider cart) {
   );
 }
 
-  Widget _buildBotonContinuar(BuildContext context) {
+  Widget _buildBotonContinuar(BuildContext context, CartProvider cart) {
     return SizedBox(
       width: double.infinity,
       height: 52,
@@ -208,7 +212,8 @@ Widget _buildResumenTotal(CartProvider cart) {
             borderRadius: BorderRadius.circular(14),
           ),
         ),
-        onPressed: () {
+        onPressed: () async {
+
           if (metodo == "Yappy") {
             Navigator.push(
               context,
@@ -218,8 +223,36 @@ Widget _buildResumenTotal(CartProvider cart) {
             );
           }
 
+
           if (metodo == "Efectivo") {
+
+            try {
+
+              await orderService.crearPedido(
+                productos: cart.items,
+                metodoPago: metodo,
+              );
+
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("Pedido creado correctamente"),
+                ),
+              );
+
+
+            } catch (e) {
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("Error: $e"),
+                ),
+              );
+
+            }
+
           }
+
 
           if (metodo == "Tarjeta") {
             ScaffoldMessenger.of(context).showSnackBar(
