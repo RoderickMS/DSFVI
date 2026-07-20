@@ -46,9 +46,6 @@ class _HomeScreenState extends State<HomeScreen> {
           final esTablet = anchoPantalla > 700;
           final esEscritorio = anchoPantalla > 1100;
 
-          // El banner ahora siempre ocupa el ancho completo de la pantalla,
-          // no solo el de una columna angosta centrada. Solo el contenido
-          // de abajo se limita a un ancho máximo legible.
           final anchoContenido = esEscritorio
               ? 1000.0
               : esTablet
@@ -83,19 +80,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // En pantallas de tablet/laptop la tarjeta de menú
-                            // y el historial se ven lado a lado para
-                            // aprovechar el ancho en vez de dejar espacio
-                            // vacío a los costados.
                             esTablet
-                                // IntrinsicHeight es necesario aquí: un Row con
-                                // CrossAxisAlignment.stretch donde TODOS los
-                                // hijos son Expanded, dentro de un
-                                // SingleChildScrollView (altura no acotada),
-                                // no tiene forma de saber qué altura usar y
-                                // colapsa a 0 (las tarjetas "desaparecen").
-                                // IntrinsicHeight calcula la altura real según
-                                // el contenido antes de estirar los hijos.
+
                                 ? IntrinsicHeight(
                                     child: Row(
                                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -149,7 +135,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ---------- Navegación ----------
 
   void _irAMenu(BuildContext context) {
     Navigator.push(
@@ -172,7 +157,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ---------- Banner con imágenes rotando (ahora a todo lo ancho) ----------
 
   Widget _buildBanner(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -257,9 +241,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Header del banner: solo queda el acceso a Perfil a la izquierda.
-  // Se quitó el ícono del carrito; se deja un espacio invisible del mismo
-  // tamaño a la derecha para que "BurgerShop" siga centrado.
   Widget _buildHeader(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -279,15 +260,12 @@ class _HomeScreenState extends State<HomeScreen> {
           "BurgerShop",
           style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
         ),
-        // Espaciador invisible: mismo tamaño aprox. que el botón de perfil
-        // (10 padding + 22 icono + 10 padding = 42) para mantener el
-        // título centrado sin el ícono del carrito.
+
         const SizedBox(width: 42),
       ],
     );
   }
 
-  // ---------- Tarjeta grande destacada: "Ver menú" ----------
 
   Widget _buildTarjetaMenuDestacada(BuildContext context) {
     return GestureDetector(
@@ -349,10 +327,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ---------- Historial ----------
-  // `vertical: true` se usa en tablet/laptop, donde va al lado de la
-  // tarjeta de menú y se ve mejor como un bloque más alto en vez de una
-  // barra horizontal delgada.
 
   Widget _buildBarraHistorial(BuildContext context, {bool vertical = false}) {
     if (vertical) {
@@ -436,7 +410,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ---------- Categorías, columnas según ancho de pantalla ----------
 
   Widget _buildCategorias(int columnas) {
     final categorias = [

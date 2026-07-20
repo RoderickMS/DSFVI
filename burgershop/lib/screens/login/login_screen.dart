@@ -29,10 +29,6 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  // =========================================================
-  // LÓGICA — sin cambios respecto a tu versión original.
-  // =========================================================
-
   Future<void> iniciarSesion() async {
     setState(() {
       _cargando = true;
@@ -146,9 +142,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  // =========================================================
-  // DISEÑO
-  // =========================================================
 
   @override
   Widget build(BuildContext context) {
@@ -157,9 +150,6 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            // En pantallas anchas (tablet/computadora) limitamos el ancho
-            // del formulario completo, para que el logo no se estire de
-            // borde a borde y se vea pequeño con mucho espacio vacío.
             final anchoPantalla = constraints.maxWidth;
             final anchoMaximo = anchoPantalla > 600 ? 480.0 : anchoPantalla;
 
@@ -182,10 +172,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // ---------------------------------------------------------------
-  // Encabezado con logo: se mantiene igual (fondo desenfocado + logo
-  // nítido encima), solo se extrajo a su propio método.
-  // ---------------------------------------------------------------
   Widget _buildEncabezado() {
     return SizedBox(
       height: 260,
@@ -193,10 +179,6 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          // Capa 1: la misma imagen de fondo, recortada (cover) y
-          // desenfocada. El recorte no se nota porque el blur difumina
-          // los bordes — funciona en cualquier proporción de pantalla
-          // sin dejar espacios vacíos.
           ImageFiltered(
             imageFilter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
             child: Image.asset(
@@ -205,12 +187,8 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          // Oscurece un poco el fondo desenfocado para que el logo
-          // nítido de encima resalte con más contraste.
           Container(color: Colors.black.withOpacity(0.35)),
 
-          // Capa 2: el logo real, completo y nítido, sin recortar
-          // ningún texto.
           Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 20),
@@ -225,13 +203,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // ---------------------------------------------------------------
-  // Tarjeta blanca del formulario: antes el fondo del formulario era
-  // del mismo color que el Scaffold (0xFFFFE9D9), así que no había
-  // ningún contraste entre "página" y "tarjeta". Ahora es blanca, con
-  // esquinas redondeadas arriba y una sombra sutil hacia arriba, para
-  // que se sienta como una tarjeta elevada sobre el fondo durazno.
-  // ---------------------------------------------------------------
   Widget _buildTarjetaFormulario() {
     return Container(
       width: double.infinity,

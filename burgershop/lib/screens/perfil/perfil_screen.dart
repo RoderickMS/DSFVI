@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
 
-// ==================== PALETA (misma que Admin) ====================
 
 class _AppColors {
   static const primary = Color(0xFFE8590C);
@@ -17,10 +16,6 @@ class _AppColors {
   static const danger = Color(0xFFD32F2F);
 }
 
-// Pantalla de Perfil. Se llega aquí desde Home (ícono de perfil o tarjeta).
-// Carga los datos reales del usuario autenticado: primero desde
-// FirebaseAuth (correo, nombre si lo tiene) y luego completa/actualiza con
-// el documento del usuario guardado en Firestore, colección "usuarios".
 class PerfilScreen extends StatefulWidget {
   const PerfilScreen({super.key});
 
@@ -46,19 +41,15 @@ class _PerfilScreenState extends State<PerfilScreen> {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      // No hay sesión iniciada; deja los campos vacíos y detiene la carga.
       setState(() => _cargando = false);
       return;
     }
 
-    // Datos base que siempre vienen de FirebaseAuth.
     String nombre = user.displayName ?? "";
     String email = user.email ?? "";
     String telefono = user.phoneNumber ?? "";
 
     try {
-      // Se completa/actualiza con el documento del usuario en Firestore,
-      // por si ahí se guardó el nombre o teléfono al registrarse.
       final doc = await FirebaseFirestore.instance
           .collection("usuarios")
           .doc(user.uid)
@@ -74,8 +65,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
             : telefono;
       }
     } catch (_) {
-      // Si falla la consulta a Firestore, seguimos con lo que ya tenemos
-      // de FirebaseAuth en vez de romper la pantalla.
     }
 
     if (!mounted) return;
@@ -104,9 +93,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
             if (Navigator.of(context).canPop()) {
               Navigator.pop(context);
             }
-            // Si no hay a dónde regresar (se abrió como pantalla raíz),
-            // simplemente no hacemos nada; evita depender de rutas
-            // nombradas que tu app aún no tiene configuradas.
           },
         ),
         title: const Text(
@@ -315,11 +301,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
     );
   }
 
-  // -----------------------------------------------------------------
-  // Editar perfil: modal con los campos nombre y teléfono. Guarda en
-  // Firestore (colección "usuarios") y actualiza el displayName en
-  // FirebaseAuth. Al cerrar, recarga los datos mostrados en pantalla.
-  // -----------------------------------------------------------------
   void _abrirEditarPerfil(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
@@ -477,10 +458,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
     );
   }
 
-  // -----------------------------------------------------------------
-  // Mis pedidos: modal con la lista de pedidos reales del usuario,
-  // consultados en Firestore ("pedidos" filtrado por su correo).
-  // -----------------------------------------------------------------
   void _abrirMisPedidos(BuildContext context) {
     final email = FirebaseAuth.instance.currentUser?.email;
 
@@ -671,10 +648,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
     );
   }
 
-  // -----------------------------------------------------------------
-  // Ayuda: modal con indicaciones básicas de cómo usar la app,
-  // organizadas como preguntas expandibles (FAQ).
-  // -----------------------------------------------------------------
   void _abrirAyuda(BuildContext context) {
     final secciones = [
       {

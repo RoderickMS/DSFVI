@@ -26,7 +26,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => _cargando = true);
 
     try {
-      // Crear usuario en Firebase Authentication
       UserCredential userCredential =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: correoController.text.trim(),
@@ -129,7 +128,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // ---------- Barra superior con flecha ----------
 
   Widget _buildBarraSuperior() {
     return Padding(
@@ -150,7 +148,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // Barra de progreso segmentada, no solo un texto de "paso x de y".
   Widget _buildIndicadorPasos() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 28),
@@ -172,7 +169,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // ---------- Paso 1: datos personales ----------
+  //datos personales
 
   Widget _buildPasoUno({required Key key}) {
     return Column(
@@ -233,7 +230,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // ---------- Paso 2: datos de acceso ----------
+  //datos de acceso
 
   Widget _buildPasoDos({required Key key}) {
     return Column(
@@ -300,8 +297,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // ---------- Campos con línea inferior, sin caja rellena ----------
-  // Estilo distinto al Login (que usa cajas con fondo blanco/relleno).
 
   Widget _buildCampoSubrayado({
     required TextEditingController controller,

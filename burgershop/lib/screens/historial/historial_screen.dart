@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-// Misma paleta que el resto de la app (home, perfil, login).
-// Si ya tienes lib/theme/app_colors.dart, borra esta clase e importa esa.
 class AppColors {
   static const background = Color(0xFFFFF8F2);
   static const primary = Color(0xFFFF7A00);
@@ -16,11 +14,6 @@ class AppColors {
 class HistorialScreen extends StatelessWidget {
   const HistorialScreen({super.key});
 
-  // ---------------------------------------------------------------------
-  // Solo diseño: asigna un color según el texto de "estado" para que el
-  // usuario identifique de un vistazo en qué va su pedido. No cambia
-  // ningún dato, solo cómo se pinta.
-  // ---------------------------------------------------------------------
   Color _colorEstado(String estado) {
     switch (estado.toLowerCase()) {
       case "completado":
@@ -32,7 +25,7 @@ class HistorialScreen extends StatelessWidget {
       case "cancelado":
         return const Color(0xFFE53935);
       default:
-        return AppColors.textGrey; // pendiente / desconocido
+        return AppColors.textGrey; 
     }
   }
 
@@ -170,11 +163,6 @@ class HistorialScreen extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Tarjeta de un pedido individual. Usa exactamente los mismos campos que el
-// diseño original (pedido.id, pedido['total'], pedido['estado']) — solo
-// cambia la presentación visual.
-// ---------------------------------------------------------------------------
 class _PedidoCard extends StatelessWidget {
   final QueryDocumentSnapshot pedido;
   final Color Function(String estado) colorEstado;
@@ -183,10 +171,6 @@ class _PedidoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // IMPORTANTE: pedido['campo'] es una lectura estricta — si el campo no
-    // existe en el documento, lanza una excepción en vez de null (por eso
-    // el "?? valor" de respaldo nunca llegaba a aplicarse). Convertimos a
-    // Map primero para que la lectura sea segura y el respaldo sí funcione.
     final data = pedido.data() as Map<String, dynamic>? ?? {};
 
     final String estado = (data['estado'] as String?) ?? "Pendiente";

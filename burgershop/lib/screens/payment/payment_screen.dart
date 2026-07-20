@@ -84,8 +84,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
-  // ---------- Tarjeta seleccionable de cada método (mismo RadioListTile,
-  // solo con apariencia de tarjeta en vez del estilo por defecto) ----------
+  //Tarjeta seleccionable de cada método
 
   Widget _buildOpcionMetodo({
     required String value,
@@ -134,7 +133,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
-  // ---------- Resumen del total (misma info, tarjeta con sombra) ----------
+  //Resumen del total
 
 Widget _buildResumenTotal(CartProvider cart) {
   return Container(
@@ -197,7 +196,6 @@ Widget _buildResumenTotal(CartProvider cart) {
     ),
   );
 }
-  // ---------- Botón continuar (misma lógica exacta que ya tenías) ----------
 
   Widget _buildBotonContinuar(BuildContext context) {
     return SizedBox(
@@ -221,7 +219,6 @@ Widget _buildResumenTotal(CartProvider cart) {
           }
 
           if (metodo == "Efectivo") {
-            // Después guardaremos el pedido aquí
           }
 
           if (metodo == "Tarjeta") {

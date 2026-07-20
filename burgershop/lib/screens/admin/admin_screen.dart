@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import '../login/login_screen.dart';
 
-// ==================== PALETA Y CONSTANTES ====================
 
 class AppColors {
   static const primary = Color(0xFFE8590C);
@@ -30,17 +29,11 @@ const Map<String, Color> kColorCategoria = {
   "Acompañamientos": Color(0xFF2E7D32),
 };
 
-// ==================== ADMIN SCREEN ====================
 
 class AdminScreen extends StatelessWidget {
   const AdminScreen({super.key});
 
-  // -----------------------------------------------------------------
-  // Cerrar sesión: confirma, cierra sesión en Firebase y manda al
-  // usuario a LoginScreen, limpiando todo el historial de navegación
-  // para que no pueda volver atrás con el botón "back" a una pantalla
-  // de admin sin sesión.
-  // -----------------------------------------------------------------
+  // Cerrar sesión: confirma, cierra sesión y redirige al login
   Future<void> _cerrarSesion(BuildContext context) async {
     final confirmar = await showDialog<bool>(
       context: context,
@@ -118,7 +111,6 @@ class AdminScreen extends StatelessWidget {
   }
 }
 
-// ==================== TAB 1: PRODUCTOS ====================
 
 class _ProductosTab extends StatefulWidget {
   const _ProductosTab();
@@ -129,9 +121,6 @@ class _ProductosTab extends StatefulWidget {
 
 class _ProductosTabState extends State<_ProductosTab> {
   String _busqueda = "";
-  // null = "todas las categorías". Es un filtro nuevo, puramente visual,
-  // no reemplaza ninguna consulta: sigue siendo el mismo stream de
-  // Firestore, solo se filtra la lista ya cargada en el cliente.
   String? _categoriaFiltro;
 
   @override
@@ -218,10 +207,7 @@ class _ProductosTabState extends State<_ProductosTab> {
     );
   }
 
-  // -----------------------------------------------------------------
-  // Chips de categoría para filtrar. Reemplaza la agrupación visual por
-  // secciones del diseño anterior por un filtro más rápido de usar.
-  // -----------------------------------------------------------------
+  //categoría
   Widget _buildFiltroCategorias() {
     return SizedBox(
       height: 38,
@@ -669,7 +655,7 @@ class _ProductosTabState extends State<_ProductosTab> {
   }
 }
 
-// ==================== TAB 2: PEDIDOS (HISTORIAL) ====================
+//historial de pedidos
 
 class _PedidosTab extends StatelessWidget {
   const _PedidosTab();
@@ -714,12 +700,7 @@ class _PedidosTab extends StatelessWidget {
     );
   }
 
-  // -----------------------------------------------------------------
-  // Tarjeta de pedido individual (antes era un ExpansionTile anidado
-  // dentro de otro ExpansionTile). Ahora es una tarjeta compacta que,
-  // al tocarla, abre el detalle completo en un modal — mismo contenido
-  // y misma actualización de estado, solo cambia dónde se muestra.
-  // -----------------------------------------------------------------
+  // Tarjeta de pedido individual
   Widget _buildPedidoCard(BuildContext context, QueryDocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     final cliente = (data['correoCliente'] ?? 'Cliente').toString();
@@ -779,10 +760,7 @@ class _PedidosTab extends StatelessWidget {
     );
   }
 
-  // -----------------------------------------------------------------
-  // Detalle del pedido en un modal: mismos datos (productos, total,
-  // dropdown de estado) que antes vivían en el ExpansionTile anidado.
-  // -----------------------------------------------------------------
+  // Detalle del pedido
   void _abrirDetallePedido(BuildContext context, QueryDocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     final cliente = (data['correoCliente'] ?? 'Cliente').toString();

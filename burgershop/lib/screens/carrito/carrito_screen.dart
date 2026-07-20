@@ -29,7 +29,6 @@ class CartScreen extends StatelessWidget {
     );
   }
 
-  // ---------- Estado vacío ----------
 
   Widget _buildCarritoVacio() {
     return Center(
@@ -56,7 +55,7 @@ class CartScreen extends StatelessWidget {
     );
   }
 
-  // ---------- Lista de productos ----------
+  //Lista de productos
 
   Widget _buildListaConItems(BuildContext context, CartProvider cart) {
     return ListView.separated(
@@ -152,7 +151,7 @@ class CartScreen extends StatelessWidget {
     );
   }
 
-  // Botones +/- para ajustar cantidad, misma lógica que ya tenías.
+  // Botones +/- para ajustar cantidad
   Widget _buildControlCantidad(CartProvider cart, dynamic item) {
     return Row(
       children: [
@@ -194,7 +193,7 @@ class CartScreen extends StatelessWidget {
     );
   }
 
-  // ---------- Resumen y botón de pago ----------
+  // Resumen y botón pago
 
 Widget _buildResumenYBoton(BuildContext context, CartProvider cart) {
   return Container(

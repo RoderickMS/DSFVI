@@ -46,11 +46,7 @@ class CartProvider extends ChangeNotifier {
     }
   }
 
-  // ==========================
-  // CÁLCULOS DEL CARRITO
-  // ==========================
-
-  /// Suma de todos los productos (sin ITBMS)
+//calculos
   double get subtotal {
     return _items.fold(
       0.0,
@@ -58,17 +54,14 @@ class CartProvider extends ChangeNotifier {
     );
   }
 
-  /// ITBMS del 7%
   double get itbms {
     return subtotal * 0.07;
   }
 
-  /// Total a pagar (Subtotal + ITBMS)
   double get totalConItbms {
     return subtotal + itbms;
   }
 
-  /// Se mantiene para no romper el resto del proyecto
   double get total => subtotal;
 
   void clearCart() {

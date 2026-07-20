@@ -71,8 +71,6 @@ class _MenuScreenState extends State<MenuScreen> {
     );
   }
 
-  // Las categorías también pueden salir de Firestore (colección /categorias).
-  // Por ahora dejamos una lista fija + "Todas".
   Widget _buildCategorias() {
     final categorias = ["Todas", "Hamburguesas", "Bebidas", "Postres"];
 
@@ -110,12 +108,11 @@ class _MenuScreenState extends State<MenuScreen> {
   }
 
   Widget _buildContenido() {
-    // Solo trae productos disponibles - el switch que maneja el admin
+    // Solo trae productos disponibles
     Query query = FirebaseFirestore.instance
         .collection('productos')
         .where('disponible', isEqualTo: true);
 
-    // Si hay categoría seleccionada distinta de "Todas", filtramos también
     if (_categoriaSeleccionada != "Todas") {
       query = query.where('categoria', isEqualTo: _categoriaSeleccionada);
     }
@@ -192,7 +189,6 @@ class _MenuScreenState extends State<MenuScreen> {
 
     return GestureDetector(
       onTap: () {
-        // TODO: navegar al detalle del producto
       },
       child: Container(
         decoration: BoxDecoration(

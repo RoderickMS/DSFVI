@@ -44,7 +44,6 @@ class AuthService {
     DocumentSnapshot datos = await ref.get();
 
 
-    // Si es nuevo usuario de Google
     if (!datos.exists) {
 
       await ref.set({
